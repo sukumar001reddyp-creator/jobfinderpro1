@@ -7,3 +7,5 @@ from .applied_job import AppliedJob
 from .search_history import SearchHistory
 from .alert import Alert
 from .resume import Resume
+from .job_alert import JobAlert
+from .recent_job import RecentJob

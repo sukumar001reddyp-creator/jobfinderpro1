@@ -7,13 +7,8 @@
 <section class="container py-5">
 
     <!-- Back Button -->
-    <a
-        href="{{ url_for('search.search') }}"
-        class="btn btn-outline-secondary mb-4">
-
-        <i class="bi bi-arrow-left"></i>
-        Back to Search
-
+    <a href="{{ url_for('search.search') }}" class="btn btn-outline-secondary mb-4">
+        <i class="bi bi-arrow-left"></i> Back to Search
     </a>
 
     <div class="card shadow border-0 rounded-4">
@@ -24,45 +19,77 @@
             <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
 
                 <div>
-
-                    <h1 class="fw-bold mb-2">
-
-                        {{ job.title }}
-
-                    </h1>
+                    <h1 class="fw-bold mb-2">{{ job.title }}</h1>
 
                     <h5 class="text-primary">
-
                         {{ job.company.name }}
-
                         <i class="bi bi-patch-check-fill"></i>
-
                     </h5>
-
                 </div>
 
-                <!-- Buttons -->
-                <div class="d-flex gap-2">
+                <!-- Action Buttons -->
+                <div class="d-flex gap-2 flex-wrap">
 
+                    <!-- Apply Now -->
                     <a
                         href="{{ job.apply_url }}"
                         target="_blank"
                         class="btn btn-primary btn-lg">
 
                         <i class="bi bi-box-arrow-up-right"></i>
+
                         Apply Now
 
                     </a>
 
+                    <!-- Applied Button -->
+
+                    {% if is_applied %}
+
+                    <button
+                        class="btn btn-success btn-lg"
+                        disabled>
+
+                        <i class="bi bi-check-circle-fill"></i>
+
+                        Applied
+
+                    </button>
+
+                    {% else %}
+
+                    <form
+                        action="{{ url_for('applied_jobs.apply', job_id=job.id) }}"
+                        method="POST"
+                        class="d-inline">
+
+                        <button
+                            type="submit"
+                            class="btn btn-success btn-lg">
+
+                            <i class="bi bi-check-circle"></i>
+
+                            I Applied
+
+                        </button>
+
+                    </form>
+
+                    {% endif %}
+
+                    <!-- Save Job -->
+
                     <form
                         action="{{ url_for('saved_jobs.save_job', job_id=job.id) }}"
-                        method="POST">
+                        method="POST"
+                        class="d-inline">
 
                         <button
                             type="submit"
                             class="btn btn-outline-danger btn-lg">
 
                             <i class="bi bi-heart"></i>
+
                             Save Job
 
                         </button>
@@ -75,7 +102,8 @@
 
             <hr class="my-4">
 
-            <!-- Job Info -->
+            <!-- Job Information -->
+
             <div class="row g-4">
 
                 <div class="col-md-3">
@@ -84,7 +112,9 @@
 
                     <p class="mb-0">
 
-                        {{ job.city }}, {{ job.country }}
+                        {{ job.city }},
+
+                        {{ job.country }}
 
                     </p>
 
@@ -109,7 +139,9 @@
                     <p class="mb-0">
 
                         ₹{{ "{:,}".format(job.salary_min or 0) }}
+
                         -
+
                         ₹{{ "{:,}".format(job.salary_max or 0) }}
 
                     </p>
@@ -141,21 +173,23 @@
             <hr class="my-4">
 
             <!-- Description -->
+
             <h3 class="mb-3">
 
                 Job Description
 
             </h3>
 
-            <p>
+            <div class="job-description">
 
-                {{ job.description }}
+                {{ job.description | safe }}
 
-            </p>
+            </div>
 
             <hr class="my-4">
 
             <!-- Skills -->
+
             <h3 class="mb-3">
 
                 Skills Required
@@ -164,7 +198,7 @@
 
             <p>
 
-                {{ job.skills }}
+                {{ job.skills or "Not specified" }}
 
             </p>
 

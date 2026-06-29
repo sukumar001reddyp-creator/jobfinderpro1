@@ -22,19 +22,10 @@ resume_bp = Blueprint(
     url_prefix="/resume"
 )
 
-@resume_bp.route("/<int:resume_id>")
-@login_required
-def preview(resume_id):
 
-    resume = Resume.query.filter_by(
-        id=resume_id,
-        user_id=current_user.id
-    ).first_or_404()
-
-    return render_template(
-        "resume/preview.html",
-        resume=resume
-    )
+# ----------------------------
+# Resume List
+# ----------------------------
 @resume_bp.route("/")
 @login_required
 def index():
@@ -49,6 +40,9 @@ def index():
     )
 
 
+# ----------------------------
+# Create Resume
+# ----------------------------
 @resume_bp.route("/create", methods=["GET", "POST"])
 @login_required
 def create():
@@ -91,4 +85,90 @@ def create():
 
     return render_template(
         "resume/create.html"
+    )
+
+
+# ----------------------------
+# Resume Preview
+# ----------------------------
+@resume_bp.route("/<int:resume_id>")
+@login_required
+def preview(resume_id):
+
+    resume = Resume.query.filter_by(
+        id=resume_id,
+        user_id=current_user.id
+    ).first_or_404()
+
+    return render_template(
+        "resume/preview.html",
+        resume=resume
+    )
+
+
+# ----------------------------
+# Edit Resume
+# ----------------------------
+@resume_bp.route("/edit/<int:resume_id>", methods=["GET", "POST"])
+@login_required
+def edit(resume_id):
+
+    resume = Resume.query.filter_by(
+        id=resume_id,
+        user_id=current_user.id
+    ).first_or_404()
+
+    if request.method == "POST":
+
+        resume.title = request.form["title"]
+        resume.full_name = request.form["full_name"]
+        resume.email = request.form["email"]
+        resume.phone = request.form["phone"]
+        resume.summary = request.form["summary"]
+        resume.skills = request.form["skills"]
+        resume.experience = request.form["experience"]
+        resume.education = request.form["education"]
+
+        db.session.commit()
+
+        flash(
+            "Resume updated successfully!",
+            "success"
+        )
+
+        return redirect(
+            url_for(
+                "resume.preview",
+                resume_id=resume.id
+            )
+        )
+
+    return render_template(
+        "resume/edit.html",
+        resume=resume
+    )
+
+
+# ----------------------------
+# Delete Resume
+# ----------------------------
+@resume_bp.route("/delete/<int:resume_id>", methods=["POST"])
+@login_required
+def delete(resume_id):
+
+    resume = Resume.query.filter_by(
+        id=resume_id,
+        user_id=current_user.id
+    ).first_or_404()
+
+    db.session.delete(resume)
+    db.session.commit()
+
+    flash(
+        "Resume deleted successfully!",
+        "success"
+    )
+
+    return redirect(
+        url_for("resume.index")
     )

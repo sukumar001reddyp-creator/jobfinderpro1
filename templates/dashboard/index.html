@@ -8,197 +8,97 @@
 
     <!-- Welcome -->
     <div class="mb-5">
-
         <h1 class="fw-bold">
-
-            Welcome Back,
-
-            <span class="text-primary">
-
-                {{ current_user.name }}
-
-            </span>
-
-            👋
-
+            Welcome Back, 
+            <span class="text-primary">{{ current_user.name }}</span> 👋
         </h1>
-
-        <p class="text-muted">
-
+        <p class="text-muted fs-5">
             Manage your jobs, profile and career from one place.
-
         </p>
-
     </div>
 
-    <!-- Statistics -->
-
+    <!-- Statistics Cards -->
     <div class="row g-4 mb-5">
 
+        <!-- Saved Jobs -->
         <div class="col-md-6 col-xl-3">
-
-            <div class="card border-0 shadow rounded-4">
-
-                <div class="card-body text-center">
-
-                    <i class="bi bi-bookmark-heart-fill display-5 text-danger"></i>
-
-                    <h2 class="mt-3">
-
-                        {{ saved_jobs }}
-
-                    </h2>
-
-                    <p class="text-muted mb-0">
-
-                        Saved Jobs
-
-                    </p>
-
+            <a href="{{ url_for('saved_jobs.list_saved_jobs') }}" class="text-decoration-none">
+                <div class="card border-0 shadow rounded-4 h-100 hover-card">
+                    <div class="card-body text-center">
+                        <i class="bi bi-bookmark-heart-fill display-5 text-danger"></i>
+                        <h2 class="mt-3 mb-1">{{ saved_jobs | default(0) }}</h2>
+                        <p class="text-muted mb-0">Saved Jobs</p>
+                    </div>
                 </div>
-
-            </div>
-
+            </a>
         </div>
 
+        <!-- Job Alerts -->
         <div class="col-md-6 col-xl-3">
-
-            <div class="card border-0 shadow rounded-4">
-
-                <div class="card-body text-center">
-
-                    <i class="bi bi-bell-fill display-5 text-warning"></i>
-
-                    <h2 class="mt-3">
-
-                        {{ job_alerts }}
-
-                    </h2>
-
-                    <p class="text-muted mb-0">
-
-                        Job Alerts
-
-                    </p>
-
+            <a href="{{ url_for('job_alert.index') }}" class="text-decoration-none">
+                <div class="card border-0 shadow rounded-4 h-100 hover-card">
+                    <div class="card-body text-center">
+                        <i class="bi bi-bell-fill display-5 text-warning"></i>
+                        <h2 class="mt-3 mb-1">{{ job_alerts | default(0) }}</h2>
+                        <p class="text-muted mb-0">Job Alerts</p>
+                    </div>
                 </div>
-
-            </div>
-
+            </a>
         </div>
 
+        <!-- Applied Jobs -->
         <div class="col-md-6 col-xl-3">
-
-            <div class="card border-0 shadow rounded-4">
-
-                <div class="card-body text-center">
-
-                    <i class="bi bi-briefcase-fill display-5 text-primary"></i>
-
-                    <h2 class="mt-3">
-
-                        0
-
-                    </h2>
-
-                    <p class="text-muted mb-0">
-
-                        Applied Jobs
-
-                    </p>
-
+            <a href="{{ url_for('applied_jobs.index') }}" class="text-decoration-none">
+                <div class="card border-0 shadow rounded-4 h-100 hover-card">
+                    <div class="card-body text-center">
+                        <i class="bi bi-briefcase-fill display-5 text-primary"></i>
+                        <h2 class="mt-3 mb-1">0</h2>
+                        <p class="text-muted mb-0">Applied Jobs</p>
+                    </div>
                 </div>
-
-            </div>
-
+            </a>
         </div>
 
+        <!-- Resumes -->
         <div class="col-md-6 col-xl-3">
-
-            <div class="card border-0 shadow rounded-4">
-
-                <div class="card-body text-center">
-
-                    <i class="bi bi-file-earmark-person-fill display-5 text-success"></i>
-
-                    <h2 class="mt-3">
-
-                        0
-
-                    </h2>
-
-                    <p class="text-muted mb-0">
-
-                        Resumes
-
-                    </p>
-
+            <a href="{{ url_for('resume.index') }}" class="text-decoration-none">
+                <div class="card border-0 shadow rounded-4 h-100 hover-card">
+                    <div class="card-body text-center">
+                        <i class="bi bi-file-earmark-person-fill display-5 text-success"></i>
+                        <h2 class="mt-3 mb-1">{{ resume_count | default(0) }}</h2>
+                        <p class="text-muted mb-0">My Resumes</p>
+                    </div>
                 </div>
-
-            </div>
-
+            </a>
         </div>
 
     </div>
 
-    <!-- Quick Actions -->
-
+    <!-- Quick Actions - All in One Single Line -->
     <div class="card border-0 shadow rounded-4">
-
         <div class="card-body">
-
-            <h4 class="mb-4">
-
-                Quick Actions
-
-            </h4>
-
-            <div class="d-flex flex-wrap gap-3">
-
-                <a
-                    href="{{ url_for('search.search') }}"
-                    class="btn btn-primary">
-
-                    <i class="bi bi-search"></i>
-
-                    Search Jobs
-
+            <h4 class="mb-4">Quick Actions</h4>
+            <div class="d-flex flex-nowrap gap-3 overflow-auto pb-2">
+                <a href="{{ url_for('search.search') }}" class="btn btn-primary btn-lg px-4 flex-shrink-0">
+                    <i class="bi bi-search"></i> Search Jobs
                 </a>
-
-                <a
-                    href="{{ url_for('saved_jobs.list_saved_jobs') }}"
-                    class="btn btn-outline-danger">
-
-                    <i class="bi bi-heart-fill"></i>
-
-                    Saved Jobs
-
+                <a href="{{ url_for('saved_jobs.list_saved_jobs') }}" class="btn btn-outline-danger btn-lg px-4 flex-shrink-0">
+                    <i class="bi bi-heart-fill"></i> Saved Jobs
                 </a>
-
-                <a
-                    href="#"
-                    class="btn btn-outline-success">
-
-                    <i class="bi bi-file-earmark-person"></i>
-
-                    Resume Builder
-
+                <a href="{{ url_for('applied_jobs.index') }}" class="btn btn-outline-primary btn-lg px-4 flex-shrink-0">
+                    <i class="bi bi-briefcase-fill"></i> Applied Jobs
                 </a>
-
-                <a
-                    href="#"
-                    class="btn btn-outline-warning">
-
-                    <i class="bi bi-bell"></i>
-
-                    Job Alerts
-
+                <a href="{{ url_for('resume.index') }}" class="btn btn-outline-success btn-lg px-4 flex-shrink-0">
+                    <i class="bi bi-file-earmark-person"></i> Resume Builder
                 </a>
-
+                <a href="{{ url_for('job_alert.index') }}" class="btn btn-outline-warning btn-lg px-4 flex-shrink-0">
+                    <i class="bi bi-bell"></i> Job Alerts
+                </a>
+                <a href="{{ url_for('recent_jobs.index') }}" class="btn btn-outline-info btn-lg px-4 flex-shrink-0">
+                    <i class="bi bi-clock-history"></i> Recently Viewed
+                </a>
             </div>
-
         </div>
-
     </div>
 
 </section>

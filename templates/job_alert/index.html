@@ -1,0 +1,124 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}My Job Alerts{% endblock %}
+
+{% block content %}
+
+<section class="container py-5">
+
+    <div class="d-flex justify-content-between align-items-center mb-5">
+
+        <h2 class="fw-bold">
+
+            My Job Alerts
+
+        </h2>
+
+        <a
+            href="{{ url_for('job_alert.create') }}"
+            class="btn btn-primary">
+
+            <i class="bi bi-plus-circle"></i>
+
+            New Alert
+
+        </a>
+
+    </div>
+
+    {% if alerts %}
+
+    <div class="row g-4">
+
+        {% for alert in alerts %}
+
+        <div class="col-lg-6">
+
+            <div class="card shadow border-0 rounded-4">
+
+                <div class="card-body">
+
+                    <h5>
+
+                        {{ alert.keyword }}
+
+                    </h5>
+
+                    <p>
+
+                        <strong>Location:</strong>
+
+                        {{ alert.location or "Any" }}
+
+                    </p>
+
+                    <p>
+
+                        <strong>Employment:</strong>
+
+                        {{ alert.employment_type or "Any" }}
+
+                    </p>
+
+                    <p>
+
+                        <strong>Frequency:</strong>
+
+                        {{ alert.frequency }}
+
+                    </p>
+
+                    <p>
+
+                        <strong>Remote:</strong>
+
+                        {% if alert.remote %}
+
+                            Yes
+
+                        {% else %}
+
+                            No
+
+                        {% endif %}
+
+                    </p>
+
+                    <form
+                        action="{{ url_for('job_alert.delete', alert_id=alert.id) }}"
+                        method="POST">
+
+                        <button
+                            class="btn btn-outline-danger">
+
+                            <i class="bi bi-trash"></i>
+
+                            Delete
+
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+    {% else %}
+
+    <div class="alert alert-info">
+
+        No Job Alerts Found.
+
+    </div>
+
+    {% endif %}
+
+</section>
+
+{% endblock %}

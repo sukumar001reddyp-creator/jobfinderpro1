@@ -1,0 +1,226 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Applied Jobs | JobFinder Pro{% endblock %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+
+            <h2 class="fw-bold">
+                <i class="bi bi-briefcase-fill text-primary"></i>
+                Applied Jobs
+            </h2>
+
+            <p class="text-muted mb-0">
+                Track all your job applications in one place.
+            </p>
+
+        </div>
+
+        <a href="{{ url_for('search.search') }}"
+           class="btn btn-primary">
+
+            <i class="bi bi-search"></i>
+
+            Find Jobs
+
+        </a>
+
+    </div>
+
+    {% if jobs %}
+
+    <div class="row g-4">
+
+        {% for applied in jobs %}
+
+        <div class="col-lg-6">
+
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+
+                <div class="card-body">
+
+                    <div class="d-flex justify-content-between">
+
+                        <div>
+
+                            <h5 class="fw-bold">
+
+                                {{ applied.job.title }}
+
+                            </h5>
+
+                            <p class="text-primary mb-1">
+
+                                {{ applied.job.company.name }}
+
+                            </p>
+
+                            <small class="text-muted">
+
+                                <i class="bi bi-geo-alt"></i>
+
+                                {{ applied.job.city }},
+                                {{ applied.job.country }}
+
+                            </small>
+
+                        </div>
+
+                        <form
+    action="{{ url_for('applied_jobs.update_status', application_id=applied.id) }}"
+    method="POST"
+    class="d-flex align-items-center gap-2">
+
+    <select
+        name="status"
+        class="form-select form-select-sm"
+        style="width:180px;">
+
+        <option value="Applied"
+            {% if applied.status=="Applied" %}selected{% endif %}>
+            Applied
+        </option>
+
+        <option value="Under Review"
+            {% if applied.status=="Under Review" %}selected{% endif %}>
+            Under Review
+        </option>
+
+        <option value="Interview Scheduled"
+            {% if applied.status=="Interview Scheduled" %}selected{% endif %}>
+            Interview Scheduled
+        </option>
+
+        <option value="Interview Completed"
+            {% if applied.status=="Interview Completed" %}selected{% endif %}>
+            Interview Completed
+        </option>
+
+        <option value="Offer Received"
+            {% if applied.status=="Offer Received" %}selected{% endif %}>
+            Offer Received
+        </option>
+
+        <option value="Rejected"
+            {% if applied.status=="Rejected" %}selected{% endif %}>
+            Rejected
+        </option>
+
+        <option value="Joined"
+            {% if applied.status=="Joined" %}selected{% endif %}>
+            Joined
+        </option>
+
+    </select>
+
+    <button
+        type="submit"
+        class="btn btn-success btn-sm">
+
+        Update
+
+    </button>
+
+</form>
+
+                    </div>
+
+                    <hr>
+
+                    <p class="mb-2">
+
+                        <strong>Applied On:</strong>
+
+                        {{ applied.applied_at.strftime("%d %b %Y %I:%M %p") }}
+
+                    </p>
+
+                    {% if applied.notes %}
+
+                    <p class="text-muted">
+
+                        {{ applied.notes }}
+
+                    </p>
+
+                    {% endif %}
+
+                    <div class="d-flex gap-2 mt-3">
+
+                        <a href="{{ url_for('jobs.detail', job_id=applied.job.id) }}"
+                           class="btn btn-outline-primary">
+
+                            <i class="bi bi-eye"></i>
+
+                            View Job
+
+                        </a>
+
+                        <form action="{{ url_for('applied_jobs.remove', job_id=applied.job.id) }}"
+                              method="POST">
+
+                            <button
+                                class="btn btn-outline-danger"
+                                onclick="return confirm('Remove this application?')">
+
+                                <i class="bi bi-trash"></i>
+
+                                Remove
+
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+    {% else %}
+
+    <div class="card border-0 shadow-sm rounded-4">
+
+        <div class="card-body text-center py-5">
+
+            <i class="bi bi-briefcase display-1 text-muted"></i>
+
+            <h3 class="mt-4">
+
+                No Applied Jobs Yet
+
+            </h3>
+
+            <p class="text-muted">
+
+                Once you apply for a job, it will appear here.
+
+            </p>
+
+            <a href="{{ url_for('search.search') }}"
+               class="btn btn-primary">
+
+                Search Jobs
+
+            </a>
+
+        </div>
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

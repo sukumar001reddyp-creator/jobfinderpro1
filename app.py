@@ -5,6 +5,9 @@ from routes.jobs import jobs_bp
 from routes.resume import resume_bp
 from routes.saved_jobs import saved_jobs_bp
 from routes.dashboard import dashboard_bp
+from routes.applied_jobs import applied_jobs_bp
+from routes.job_alert import job_alert_bp
+from routes.recent_jobs import recent_jobs_bp
 from routes.pdf import pdf_bp
 from extensions import (
     db,
@@ -38,9 +41,12 @@ def create_app():
     app.register_blueprint(search_bp)
     app.register_blueprint(jobs_bp)
     app.register_blueprint(saved_jobs_bp)
+    app.register_blueprint(job_alert_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(resume_bp)
     app.register_blueprint(dashboard_bp)
+    app.register_blueprint(applied_jobs_bp)
+    app.register_blueprint(recent_jobs_bp)
     app.register_blueprint(pdf_bp)
     return app
 
