@@ -1,0 +1,270 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Search Jobs | JobFinder Pro{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/search.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<section class="search-page py-5 bg-light-subtle">
+    <div class="container">
+
+        <div class="text-center py-5 mb-4">
+            <h1 class="display-5 fw-black text-dark mb-3" style="letter-spacing: -1.5px; font-weight: 800;">
+                Find Your Next Dream Job
+            </h1>
+            <p class="text-muted fs-6 col-md-6 mx-auto mb-4">
+                Discover thousands of verified, high-paying career opportunities tailored to your professional skills.
+            </p>
+            
+            <div class="d-inline-flex flex-wrap justify-content-center gap-2 p-2 bg-white border rounded-pill shadow-sm">
+                <span class="badge bg-dark text-white rounded-pill px-3 py-2 fw-semibold fs-7">
+                    <i class="bi bi-briefcase-fill me-1.5 text-info"></i>
+                    {{ jobs.total if jobs and jobs.total is defined else 0 }} Total Live Jobs
+                </span>
+                
+                {% if location %}
+                <span class="badge bg-light text-dark border rounded-pill px-3 py-2 fw-medium fs-7">
+                    <i class="bi bi-geo-alt-fill me-1.5 text-danger"></i>
+                    In {{ location }}
+                </span>
+                {% endif %}
+
+                {% if keyword %}
+                <span class="badge bg-light text-dark border rounded-pill px-3 py-2 fw-medium fs-7">
+                    <i class="bi bi-tags-fill me-1.5 text-warning"></i>
+                    "{{ keyword }}"
+                </span>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-lg mb-5 bg-white mx-auto overflow-hidden border border-light-subtle" style="border-radius: 16px; max-width: 1100px;">
+            <form action="{{ url_for('search.search') }}" method="GET" class="m-0 p-2">
+                <div class="row g-2 align-items-center">
+                    
+                    <div class="col-lg-4">
+                        <div class="input-group border-0 px-3">
+                            <span class="input-group-text bg-transparent border-0 text-muted fs-5"><i class="bi bi-search"></i></span>
+                            <input type="text" name="keyword" class="form-control form-control-lg border-0 fs-6 shadow-none"
+                                   placeholder="Job title, skills, or company" value="{{ keyword or '' }}">
+                        </div>
+                    </div>
+
+                    <div class="d-none d-lg-block border-start style-separator" style="height: 30px; width: 1px; border-color: #e0e0e0 !important;"></div>
+
+                    <div class="col-lg-4">
+                        <div class="input-group border-0 px-3">
+                            <span class="input-group-text bg-transparent border-0 text-muted fs-5"><i class="bi bi-geo-alt"></i></span>
+                            <input type="text" name="location" class="form-control form-control-lg border-0 fs-6 shadow-none"
+                                   placeholder="City, state, or remote" value="{{ location or '' }}">
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3 ms-auto d-grid">
+                        <button type="submit" class="btn text-white btn-lg fw-bold fs-6 border-0 shadow py-3 transition-all" 
+                                style="background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%); border-radius: 12px;">
+                            <i class="bi bi-search me-2"></i> Search Filtered
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="row g-4">
+            
+            <div class="col-lg-3">
+                <div class="card border-0 shadow-sm rounded-4 sticky-top p-3" style="top: 24px; border: 1px solid rgba(0,0,0,0.03) !important;">
+                    <div class="card-body p-1">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h5 class="fw-bold m-0 text-dark fs-6" style="letter-spacing: -0.3px;">Refine Search</h5>
+                            <a href="{{ url_for('search.search') }}" class="text-decoration-none small text-muted fw-medium">Clear All</a>
+                        </div>
+
+                        <form action="{{ url_for('search.search') }}" method="GET" id="sidebarFilterForm">
+                            
+                            <div class="mb-4">
+                                <h6 class="fw-bold small text-dark mb-2.5">Employment Type</h6>
+                                <div class="vstack gap-2">
+                                    <div class="form-check custom-checkbox">
+                                        <input class="form-check-input shadow-none style-pointer" type="checkbox" name="employment_type" value="Full Time" id="ft" {% if employment_type == "Full Time" %}checked{% endif %}>
+                                        <label class="form-check-label small text-secondary style-pointer" for="ft">Full Time Jobs</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input shadow-none style-pointer" type="checkbox" name="employment_type" value="Part Time" id="pt" {% if employment_type == "Part Time" %}checked{% endif %}>
+                                        <label class="form-check-label small text-secondary style-pointer" for="pt">Part Time Jobs</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input shadow-none style-pointer" type="checkbox" name="remote" value="1" id="rt" {% if remote %}checked{% endif %}>
+                                        <label class="form-check-label small text-secondary style-pointer" for="rt">Remote Only</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <h6 class="fw-bold small text-dark mb-2.5">Experience Level</h6>
+                                <div class="vstack gap-2">
+                                    <div class="form-check">
+                                        <input class="form-check-input shadow-none style-pointer" type="checkbox" name="exp" value="Fresher" id="fresher">
+                                        <label class="form-check-label small text-secondary style-pointer" for="fresher">Entry / Fresher</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input shadow-none style-pointer" type="checkbox" name="exp" value="Government" id="gov">
+                                        <label class="form-check-label small text-secondary style-pointer" for="gov">Government Sector</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <h6 class="fw-bold small text-dark mb-2">Experience Matrix</h6>
+                                <input type="range" class="form-range shadow-none style-pointer" min="0" max="15" step="1" id="expRange">
+                                <div class="d-flex justify-content-between text-muted style-fs-xxs mt-1">
+                                    <span>0 Yrs</span>
+                                    <span>15+ Yrs</span>
+                                </div>
+                            </div>
+
+                            <div class="mb-2">
+                                <h6 class="fw-bold small text-dark mb-2">Expected Compensation</h6>
+                                <input type="range" class="form-range shadow-none style-pointer" min="1" max="50" step="1" id="salaryRange">
+                                <div class="d-flex justify-content-between text-muted style-fs-xxs mt-1">
+                                    <span>1 LPA</span>
+                                    <span>50+ LPA</span>
+                                </div>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-9">
+                
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <p class="text-muted m-0 small fw-medium">
+                        Showing <span class="text-dark fw-bold">{{ jobs.total if jobs and jobs.total is defined else 0 }}</span> curated job matches
+                    </p>
+                    
+                    <select name="sort" class="form-select form-select-sm border-0 shadow-sm bg-white rounded-3 w-auto py-1.5 px-3 text-secondary fw-medium shadow-none style-pointer" onchange="window.location=this.value;">
+                        <option value="{{ url_for('search.search', sort='newest') }}" {% if sort == "newest" %}selected{% endif %}>Newest First</option>
+                        <option value="{{ url_for('search.search', sort='salary_high') }}" {% if sort == "salary_high" %}selected{% endif %}>Highest Package</option>
+                    </select>
+                </div>
+
+                {% if jobs and (jobs.items if jobs.pages is defined else jobs) | length > 0 %}
+                    <div class="vstack gap-4">
+                        {% set job_list = jobs.items if jobs.pages is defined else jobs %}
+                        {% for job in job_list %}
+                        
+                        <div class="card border-0 shadow-sm rounded-4 p-4 bg-white position-relative border border-light-subtle style-premium-card transition-all">
+                            <div class="card-body p-0">
+                                
+                                <div class="d-flex align-items-center gap-3 mb-3">
+                                    {% if job.company.logo_url %}
+                                        <img src="{{ job.company.logo_url }}" alt="{{ job.company.name }} Logo" class="rounded-3 border object-fit-contain bg-white" style="width: 52px; height: 52px; padding: 4px;">
+                                    {% else %}
+                                        <div class="bg-primary-subtle text-primary rounded-3 fw-bold d-flex align-items-center justify-content-center border border-primary-subtle" style="width: 52px; height: 52px; font-size: 1.25rem;">
+                                            {{ job.company.name[0] }}
+                                        </div>
+                                    {% endif %}
+                                    
+                                    <div>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="fw-bold text-dark-emphasis fs-6">{{ job.company.name }}</span>
+                                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill py-0.5 px-2.5 fw-medium d-inline-flex align-items-center gap-1" style="font-size: 0.7rem;">
+                                                <i class="bi bi-patch-check-fill"></i> Verified
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <h4 class="fw-extrabold text-dark mb-4 text-truncate-2" style="letter-spacing: -0.5px; font-weight: 750;">
+                                    {{ job.title }}
+                                </h4>
+
+                                <div class="row row-cols-2 row-cols-sm-4 g-3 mb-4 text-secondary">
+                                    <div class="col d-flex align-items-center gap-2.5 small">
+                                        <div class="p-2 bg-danger-subtle rounded-3 text-danger"><i class="bi bi-geo-alt fs-5 d-block"></i></div>
+                                        <div>
+                                            <span class="text-muted d-block lh-1 mb-1" style="font-size: 0.65rem; font-weight: 600;">LOCATION</span>
+                                            <span class="fw-bold text-dark">{{ job.city }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="col d-flex align-items-center gap-2.5 small">
+                                        <div class="p-2 bg-primary-subtle rounded-3 text-primary"><i class="bi bi-briefcase fs-5 d-block"></i></div>
+                                        <div>
+                                            <span class="text-muted d-block lh-1 mb-1" style="font-size: 0.65rem; font-weight: 600;">JOB TYPE</span>
+                                            <span class="fw-bold text-dark">{{ job.employment_type }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="col d-flex align-items-center gap-2.5 small">
+                                        <div class="p-2 bg-success-subtle rounded-3 text-success"><i class="bi bi-laptop fs-5 d-block"></i></div>
+                                        <div>
+                                            <span class="text-muted d-block lh-1 mb-1" style="font-size: 0.65rem; font-weight: 600;">WORK MODE</span>
+                                            <span class="fw-bold text-dark">{% if job.remote %}Remote{% else %}On-Site{% endif %}</span>
+                                        </div>
+                                    </div>
+                                    <div class="col d-flex align-items-center gap-2.5 small">
+                                        <div class="p-2 bg-warning-subtle rounded-3 text-warning-emphasis"><i class="bi bi-currency-rupee fs-5 d-block"></i></div>
+                                        <div>
+                                            <span class="text-muted d-block lh-1 mb-1" style="font-size: 0.65rem; font-weight: 600;">COMPENSATION</span>
+                                            <span class="fw-extrabold text-success fs-6" style="font-weight: 800;">
+                                                {% if job.salary_min and job.salary_max %}
+                                                    ₹{{ (job.salary_min / 100000) | round(1) }} – ₹{{ (job.salary_max / 100000) | round(1) }} LPA
+                                                {% else %}
+                                                    Undisclosed
+                                                {% endif %}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="d-flex justify-content-between align-items-center pt-3 border-top border-light-subtle mt-2">
+                                    <div>
+                                        <span class="text-muted small fw-medium"><i class="bi bi-clock-history me-1.5"></i>Posted 2 days ago</span>
+                                    </div>
+                                    
+                                    <div>
+                                        <a href="{{ url_for('jobs.detail', job_id=job.id) }}" class="btn btn-dark rounded-3 px-4 py-2.5 fw-bold text-nowrap small shadow-sm transition-all" style="border-radius: 8px !important;">
+                                            View Job <i class="bi bi-arrow-right ms-1"></i>
+                                        </a>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    {% if jobs.pages is defined and jobs.pages > 1 %}
+                    <nav class="mt-5">
+                        <ul class="pagination justify-content-center align-items-center gap-1">
+                            {% for page_num in jobs.iter_pages() %}
+                                {% if page_num %}
+                                <li class="page-item {% if page_num == jobs.page %}active{% endif %}">
+                                    <a class="page-link border-0 shadow-sm rounded-3 py-2 px-3.5 {% if page_num == jobs.page %}bg-dark text-white{% else %}bg-white text-dark{% endif %} small fw-bold" href="#">
+                                        {{ page_num }}
+                                    </a>
+                                </li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                    </nav>
+                    {% endif %}
+
+                {% else %}
+                    <div class="text-center py-5 bg-white rounded-4 shadow-sm mt-2 border border-dashed p-5">
+                        <i class="bi bi-cloud-slash text-muted display-4 opacity-50 d-block mb-3"></i>
+                        <h5 class="fw-bold text-dark mb-1">No Matching Jobs Available</h5>
+                        <p class="text-muted small mb-4 mx-auto" style="max-width: 380px;">We couldn't track down openings aligning with your filtering parameter settings. Check other configurations.</p>
+                        <a href="{{ url_for('search.search') }}" class="btn btn-outline-dark btn-sm rounded-3 px-4 py-2 fw-bold">Reset Search Grid</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

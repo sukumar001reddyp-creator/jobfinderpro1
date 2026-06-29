@@ -1,0 +1,248 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}My Saved Jobs | JobFinder Pro{% endblock %}
+
+{% block content %}
+
+<section class="container py-5">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-5">
+
+        <div>
+
+            <h1 class="fw-bold mb-2">
+
+                <i class="bi bi-bookmark-heart-fill text-danger"></i>
+
+                My Saved Jobs
+
+            </h1>
+
+            <p class="text-muted mb-0">
+
+                Manage all your saved opportunities in one place.
+
+            </p>
+
+        </div>
+
+        <span class="badge bg-primary fs-6 px-3 py-2">
+
+            {{ jobs|length }} Saved
+
+        </span>
+
+    </div>
+
+    {% if jobs %}
+
+    <div class="row g-4">
+
+        {% for saved in jobs %}
+
+        <div class="col-lg-6">
+
+            <div class="card border-0 shadow rounded-4 h-100">
+
+                <div class="card-body p-4">
+
+                    <!-- Company -->
+
+                    <div class="d-flex justify-content-between align-items-start">
+
+                        <div>
+
+                            <h4 class="fw-bold mb-2">
+
+                                {{ saved.job.title }}
+
+                            </h4>
+
+                            <h6 class="text-primary mb-3">
+
+                                {{ saved.job.company.name }}
+
+                                <i class="bi bi-patch-check-fill"></i>
+
+                            </h6>
+
+                        </div>
+
+                        <span class="badge bg-success">
+
+                            Saved
+
+                        </span>
+
+                    </div>
+
+                    <!-- Info -->
+
+                    <div class="row">
+
+                        <div class="col-6 mb-3">
+
+                            <small class="text-muted">
+
+                                <i class="bi bi-geo-alt"></i>
+
+                                Location
+
+                            </small>
+
+                            <div>
+
+                                {{ saved.job.city }},
+                                {{ saved.job.country }}
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-6 mb-3">
+
+                            <small class="text-muted">
+
+                                <i class="bi bi-briefcase"></i>
+
+                                Employment
+
+                            </small>
+
+                            <div>
+
+                                {{ saved.job.employment_type }}
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-6">
+
+                            <small class="text-muted">
+
+                                <i class="bi bi-cash-stack"></i>
+
+                                Salary
+
+                            </small>
+
+                            <div>
+
+                                ₹{{ "{:,}".format(saved.job.salary_min or 0) }}
+                                -
+                                ₹{{ "{:,}".format(saved.job.salary_max or 0) }}
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-6">
+
+                            <small class="text-muted">
+
+                                <i class="bi bi-globe"></i>
+
+                                Remote
+
+                            </small>
+
+                            <div>
+
+                                {% if saved.job.remote %}
+
+                                    Yes
+
+                                {% else %}
+
+                                    No
+
+                                {% endif %}
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <hr>
+
+                    <!-- Buttons -->
+
+                    <div class="d-flex gap-2">
+
+                        <a
+                            href="{{ url_for('jobs.detail', job_id=saved.job.id) }}"
+                            class="btn btn-primary flex-fill">
+
+                            <i class="bi bi-eye"></i>
+
+                            View Details
+
+                        </a>
+
+                        <form
+                            action="{{ url_for('saved_jobs.remove_job', job_id=saved.job.id) }}"
+                            method="POST"
+                            class="flex-fill">
+
+                            <button
+                                type="submit"
+                                class="btn btn-outline-danger w-100">
+
+                                <i class="bi bi-trash"></i>
+
+                                Remove
+
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+    {% else %}
+
+    <div class="text-center py-5">
+
+        <i class="bi bi-bookmark-x display-1 text-muted"></i>
+
+        <h3 class="mt-4">
+
+            No Saved Jobs
+
+        </h3>
+
+        <p class="text-muted">
+
+            Save jobs to access them quickly later.
+
+        </p>
+
+        <a
+            href="{{ url_for('search.search') }}"
+            class="btn btn-primary btn-lg mt-3">
+
+            <i class="bi bi-search"></i>
+
+            Find Jobs
+
+        </a>
+
+    </div>
+
+    {% endif %}
+
+</section>
+
+{% endblock %}

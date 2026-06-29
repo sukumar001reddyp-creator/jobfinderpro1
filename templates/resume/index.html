@@ -1,0 +1,167 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}My Resumes | JobFinder Pro{% endblock %}
+
+{% block content %}
+
+<section class="container py-5">
+
+    <div class="d-flex justify-content-between align-items-center mb-5">
+
+        <div>
+
+            <h1 class="fw-bold">
+
+                <i class="bi bi-file-earmark-person-fill text-primary"></i>
+
+                My Resumes
+
+            </h1>
+
+            <p class="text-muted">
+
+                Create and manage your professional resumes.
+
+            </p>
+
+        </div>
+
+        <a
+            href="{{ url_for('resume.create') }}"
+            class="btn btn-primary btn-lg">
+
+            <i class="bi bi-plus-circle"></i>
+
+            Create Resume
+
+        </a>
+
+    </div>
+
+    {% if resumes %}
+
+    <div class="row g-4">
+
+        {% for resume in resumes %}
+
+        <div class="col-lg-6">
+
+            <div class="card border-0 shadow rounded-4 h-100">
+
+                <div class="card-body p-4">
+
+                    <h4 class="fw-bold">
+
+                        {{ resume.title }}
+
+                    </h4>
+
+                    <h6 class="text-primary">
+
+                        {{ resume.full_name }}
+
+                    </h6>
+
+                    <p class="text-muted mb-2">
+
+                        <i class="bi bi-envelope"></i>
+
+                        {{ resume.email }}
+
+                    </p>
+
+                    <p class="text-muted">
+
+                        <i class="bi bi-telephone"></i>
+
+                        {{ resume.phone }}
+
+                    </p>
+
+                    <hr>
+
+                    <small class="text-muted">
+
+                        Created:
+
+                        {{ resume.created_at.strftime("%d %b %Y") }}
+
+                    </small>
+
+                    <div class="d-flex gap-2 mt-4">
+
+                        <a
+    href="{{ url_for('resume.preview', resume_id=resume.id) }}"
+    class="btn btn-outline-primary flex-fill">
+
+    <i class="bi bi-eye"></i>
+
+    Preview
+
+</a>
+
+                        <a
+                            href="#"
+                            class="btn btn-outline-success flex-fill">
+
+                            <i class="bi bi-download"></i>
+
+                            PDF
+
+                        </a>
+
+                        <a
+                            href="#"
+                            class="btn btn-outline-danger flex-fill">
+
+                            <i class="bi bi-trash"></i>
+
+                            Delete
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+    {% else %}
+
+    <div class="text-center py-5">
+
+        <i class="bi bi-file-earmark-x display-1 text-muted"></i>
+
+        <h3 class="mt-4">
+
+            No Resumes Yet
+
+        </h3>
+
+        <p class="text-muted">
+
+            Create your first professional resume.
+
+        </p>
+
+        <a
+            href="{{ url_for('resume.create') }}"
+            class="btn btn-primary btn-lg">
+
+            Create Resume
+
+        </a>
+
+    </div>
+
+    {% endif %}
+
+</section>
+
+{% endblock %}
