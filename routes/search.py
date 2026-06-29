@@ -4,7 +4,8 @@ from flask import (
     request
 )
 
-from services.search_service import SearchService
+from services.live_search_service import LiveSearchService
+from utils.pagination import Pagination
 
 search_bp = Blueprint(
     "search",
@@ -16,7 +17,6 @@ search_bp = Blueprint(
 @search_bp.route("/", methods=["GET"])
 def search():
 
-    # Search Parameters
     keyword = request.args.get(
         "keyword",
         ""
@@ -50,26 +50,19 @@ def search():
         type=int
     )
 
-    # Search
-    search_service = SearchService()
+    search_service = LiveSearchService()
 
-    query = search_service.search(
+    jobs = search_service.search(
         keyword=keyword,
-        location=location,
-        company=company or None,
-        employment_type=employment_type or None,
-        remote=True if remote else None,
-        sort=sort
+        location=location
     )
 
-    # Pagination
-    jobs = query.paginate(
+    jobs = Pagination(
+        jobs,
         page=page,
-        per_page=9,
-        error_out=False
+        per_page=9
     )
 
-    # Render Page
     return render_template(
         "search/index.html",
         jobs=jobs,
