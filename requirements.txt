@@ -27,3 +27,4 @@ Flask-SQLAlchemy
 Flask-WTF
 Werkzeug
 gunicorn
+reportlab
