@@ -1,211 +1,224 @@
 {% extends "layouts/base.html" %}
 
-{% block title %}{{ job.title }} | JobFinder Pro{% endblock %}
+{% block title %}{{ job.title }} at {{ job.company.name }} | JobFinder Pro{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* 💎 లగ్జరీ ప్రొఫెషనల్ డిజైన్ బ్రో */
+    .job-detail-hero {
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+        padding: 3.5rem 0;
+    }
+    .brand-logo-wrapper-lg {
+        width: 72px;
+        height: 72px;
+        min-width: 72px;
+        position: relative;
+    }
+    .brand-avatar-fallback-lg {
+        width: 100%;
+        height: 100%;
+        border-radius: 16px;
+        font-size: 1.75rem;
+        font-weight: 800;
+        color: #ffffff !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 1;
+    }
+    .brand-logo-img-lg {
+        width: 100%;
+        height: 100%;
+        border-radius: 16px;
+        object-fit: contain;
+        background: #ffffff;
+        padding: 6px;
+        border: 1px solid rgba(0,0,0,0.05);
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 2;
+    }
+    .detail-card {
+        background: #ffffff;
+        border-radius: 16px;
+        border: 1px solid rgba(0,0,0,0.05);
+        padding: 2rem;
+    }
+    .sticky-sidebar {
+        position: sticky;
+        top: 2rem;
+    }
+    
+    /* 🎯 10 జాబ్ సైట్స్ హబ్ బటన్స్ స్టైలింగ్ బ్రో */
+    .btn-job-hub {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.7rem 1rem;
+        font-size: 0.9rem;
+        font-weight: 600;
+        border-radius: 10px;
+        margin-bottom: 0.5rem;
+        color: #ffffff !important;
+        transition: all 0.2s ease;
+        text-decoration: none;
+    }
+    .btn-job-hub:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        filter: brightness(1.1);
+    }
+    
+    .btn-linkedin { background-color: #0077b5; }
+    .btn-naukri { background-color: #4b2354; }
+    .btn-indeed { background-color: #003a9b; }
+    .btn-foundit { background-color: #5c2d91; }
+    .btn-glassdoor { background-color: #0caa41; }
+    .btn-google { background-color: #4285f4; }
+    .btn-simplyhired { background-color: #ff4500; }
+    .btn-ziprecruiter { background-color: #00b074; }
+    .btn-careerbuilder { background-color: #e02229; }
+    .btn-shine { background-color: #f58220; }
+</style>
+{% endblock %}
 
 {% block content %}
 
-<section class="container py-5">
+<!-- 🌟 1. హీరో సెక్షన్ (జాబ్ కీ ఇన్ఫర్మేషన్) -->
+<div class="job-detail-hero">
+    <div class="container">
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show rounded-3 mb-4 shadow-sm" role="alert">
+                        {{ message }}
+                        <button type="submit" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
 
-    <!-- Back Button -->
-    <a href="{{ url_for('search.search') }}" class="btn btn-outline-secondary mb-4">
-        <i class="bi bi-arrow-left"></i> Back to Search
-    </a>
+        <div class="row align-items-center g-4">
+            <div class="col-md-8">
+                <div class="d-flex flex-column flex-sm-row align-items-sm-center gap-4">
+                    
+                    {% set comp_name = job.company.name %}
+                    <div class="brand-logo-wrapper-lg">
+                        <div class="brand-avatar-fallback-lg" 
+                             style="{% if 'Google' in comp_name %} background: linear-gradient(135deg, #ea4335, #4285f4);
+                                    {% elif 'Microsoft' in comp_name %} background: linear-gradient(135deg, #f25022, #7fba00);
+                                    {% elif 'Amazon' in comp_name %} background: #111111; color: #ff9900 !important;
+                                    {% elif 'Meta' in comp_name %} background: linear-gradient(135deg, #0064e0, #0079ff);
+                                    {% else %} background: linear-gradient(135deg, #2563eb, #3b82f6); {% endif %}">
+                            {{ comp_name[0] }}
+                        </div>
+                        <img src="{{ job.logo_url }}" alt="{{ comp_name }} Logo" class="brand-logo-img-lg" onerror="this.style.display='none';">
+                    </div>
 
-    <div class="card shadow border-0 rounded-4">
-
-        <div class="card-body p-5">
-
-            <!-- Header -->
-            <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
-
-                <div>
-                    <h1 class="fw-bold mb-2">{{ job.title }}</h1>
-
-                    <h5 class="text-primary">
-                        {{ job.company.name }}
-                        <i class="bi bi-patch-check-fill"></i>
-                    </h5>
+                    <div>
+                        <h1 class="text-dark fw-bold mb-2 fs-2" style="letter-spacing: -0.8px;">{{ job.title }}</h1>
+                        <div class="d-flex flex-wrap align-items-center gap-2.5">
+                            <span class="fs-5 fw-semibold text-secondary me-1">{{ comp_name }}</span>
+                            <i class="bi bi-patch-check-fill text-primary" title="Verified Employer"></i>
+                            <span class="text-muted d-none d-sm-inline">•</span>
+                            <span class="badge bg-white text-dark border rounded-pill px-3 py-1.5 fw-medium">
+                                <i class="bi bi-geo-alt-fill text-danger me-1"></i> {{ job.city or 'Remote' }}, {{ job.country or 'Global' }}
+                            </span>
+                            <span class="badge bg-white text-dark border rounded-pill px-3 py-1.5 fw-medium">
+                                <i class="bi bi-briefcase-fill text-primary me-1"></i> {{ job.employment_type or 'Full Time' }}
+                            </span>
+                        </div>
+                    </div>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-                <!-- Action Buttons -->
-                <div class="d-flex gap-2 flex-wrap">
+<!-- 📰 2. మెయిన్ కంటెంట్ బాడీ సెక్షన్ -->
+<div class="container py-5">
+    <div class="row g-4">
+        
+        <!-- 📑 లెఫ్ట్ సైడ్: జాబ్ డిస్క్రిప్షన్ -->
+        <div class="col-lg-7">
+            <div class="detail-card shadow-sm mb-4">
+                <h4 class="fw-bold text-dark mb-4" style="letter-spacing: -0.5px;">Job Description</h4>
+                <div class="text-secondary lh-lg fs-6" style="white-space: pre-line;">
+                    {{ job.description }}
+                </div>
+            </div>
+        </div>
 
-                    <!-- Apply Now -->
-                    <a
-                        href="{{ job.apply_url }}"
-                        target="_blank"
-                        class="btn btn-primary btn-lg">
-
-                        <i class="bi bi-box-arrow-up-right"></i>
-
-                        Apply Now
-
-                    </a>
-
-                    <!-- Applied Button -->
-
-                    {% if is_applied %}
-
-                    <button
-                        class="btn btn-success btn-lg"
-                        disabled>
-
-                        <i class="bi bi-check-circle-fill"></i>
-
-                        Applied
-
-                    </button>
-
-                    {% else %}
-
-                    <form
-                        action="{{ url_for('applied_jobs.apply', job_id=job.id) }}"
-                        method="POST"
-                        class="d-inline">
-
-                        <button
-                            type="submit"
-                            class="btn btn-success btn-lg">
-
-                            <i class="bi bi-check-circle"></i>
-
-                            I Applied
-
+        <!-- 💰 రైట్ సైడ్: యాక్షన్ హబ్ సైడ్‌బార్ -->
+        <div class="col-lg-5">
+            <div class="sticky-sidebar">
+                <div class="detail-card shadow-sm bg-white mb-4">
+                    <h5 class="fw-bold text-dark mb-3">Position Action</h5>
+                    
+                    <!-- 🌟 [PRIMARY DIRECT APPLY BUTTON]: ఇది నొక్కితే నేరుగా నీ rapid_connector ఇచ్చే ఒరిజినల్ లైవ్ పేజీ కి వెళ్తుంది బ్రో -->
+                    <form action="{{ url_for('jobs.apply_job', job_id=job.id) }}" method="POST" target="_blank" class="m-0">
+                        <button type="submit" class="btn btn-primary btn-lg w-100 py-3 fw-bold rounded-3 transition-all shadow hover-lift">
+                            Apply on Official Site <i class="bi bi-box-arrow-up-right small ms-1"></i>
                         </button>
-
                     </form>
-
-                    {% endif %}
-
-                    <!-- Save Job -->
-
-                    <form
-                        action="{{ url_for('saved_jobs.save_job', job_id=job.id) }}"
-                        method="POST"
-                        class="d-inline">
-
-                        <button
-                            type="submit"
-                            class="btn btn-outline-danger btn-lg">
-
-                            <i class="bi bi-heart"></i>
-
-                            Save Job
-
-                        </button>
-
-                    </form>
-
+                    
+                    <small class="text-muted d-block text-center mt-2 small">
+                        <i class="bi bi-shield-check-fill text-success me-1"></i> Opens verified direct employer application link.
+                    </small>
                 </div>
 
+                <!-- 🌐 10 టాప్ జాబ్ సైట్స్ ఆప్షన్స్ బ్రో (బ్యాకప్ లేదా ఎక్స్‌ప్లోర్ కోసం) -->
+                <div class="detail-card shadow-sm bg-white">
+                    <h5 class="fw-bold text-dark mb-1"><i class="bi bi-search text-primary me-2"></i>Explore on Other Platforms</h5>
+                    <p class="text-muted small mb-4">Compare or search this role across global platforms.</p>
+                    
+                    {% set query = (job.company.name + " " + job.title) | urlencode %}
+                    
+                    <div class="vstack gap-1">
+                        <a href="https://www.linkedin.com/jobs/search/?keywords={{ query }}" target="_blank" class="btn-job-hub btn-linkedin">
+                            <span><i class="bi bi-linkedin me-2"></i> LinkedIn</span> <i class="bi bi-arrow-right-short"></i>
+                        </a>
+                        <a href="https://www.naukri.com/{{ job.title | replace(' ', '-') }}-jobs-for-{{ job.company.name | replace(' ', '-') }}" target="_blank" class="btn-job-hub btn-naukri">
+                            <span><i class="bi bi-briefcase-fill me-2"></i> Naukri.com</span> <i class="bi bi-arrow-right-short"></i>
+                        </a>
+                        <a href="https://www.indeed.com/jobs?q={{ query }}" target="_blank" class="btn-job-hub btn-indeed">
+                            <span><i class="bi bi-info-circle-fill me-2"></i> Indeed</span> <i class="bi bi-arrow-right-short"></i>
+                        </a>
+                        <a href="https://www.google.com/search?q={{ query }}+jobs" target="_blank" class="btn-job-hub btn-google">
+                            <span><i class="bi bi-google me-2"></i> Google Jobs</span> <i class="bi bi-arrow-right-short"></i>
+                        </a>
+                        <a href="https://www.glassdoor.com/Job/jobs.htm?sc.keyword={{ query }}" target="_blank" class="btn-job-hub btn-glassdoor">
+                            <span><i class="bi bi-shield-lock-fill me-2"></i> Glassdoor</span> <i class="bi bi-arrow-right-short"></i>
+                        </a>
+                        <a href="https://www.foundit.in/s/jobs?keyword={{ query }}" target="_blank" class="btn-job-hub btn-foundit">
+                            <span><i class="bi bi-lightning-charge-fill me-2"></i> Foundit (Monster)</span> <i class="bi bi-arrow-right-short"></i>
+                        </a>
+                        <a href="https://www.shine.com/job-search/{{ query }}" target="_blank" class="btn-job-hub btn-shine">
+                            <span><i class="bi bi-star-fill me-2"></i> Shine.com</span> <i class="bi bi-arrow-right-short"></i>
+                        </a>
+                        <a href="https://www.ziprecruiter.com/candidate/search?search={{ query }}" target="_blank" class="btn-job-hub btn-ziprecruiter">
+                            <span><i class="bi bi-mailbox2 me-2"></i> ZipRecruiter</span> <i class="bi bi-arrow-right-short"></i>
+                        </a>
+                        <a href="https://www.simplyhired.com/search?q={{ query }}" target="_blank" class="btn-job-hub btn-simplyhired">
+                            <span><i class="bi bi-check-all me-2"></i> SimplyHired</span> <i class="bi bi-arrow-right-short"></i>
+                        </a>
+                        <a href="https://www.careerbuilder.com/jobs?keywords={{ query }}" target="_blank" class="btn-job-hub btn-careerbuilder">
+                            <span><i class="bi bi-building me-2"></i> CareerBuilder</span> <i class="bi bi-arrow-right-short"></i>
+                        </a>
+                    </div>
+                </div>
             </div>
-
-            <hr class="my-4">
-
-            <!-- Job Information -->
-
-            <div class="row g-4">
-
-                <div class="col-md-3">
-
-                    <strong>📍 Location</strong>
-
-                    <p class="mb-0">
-
-                        {{ job.city }},
-
-                        {{ job.country }}
-
-                    </p>
-
-                </div>
-
-                <div class="col-md-3">
-
-                    <strong>💼 Employment</strong>
-
-                    <p class="mb-0">
-
-                        {{ job.employment_type }}
-
-                    </p>
-
-                </div>
-
-                <div class="col-md-3">
-
-                    <strong>💰 Salary</strong>
-
-                    <p class="mb-0">
-
-                        ₹{{ "{:,}".format(job.salary_min or 0) }}
-
-                        -
-
-                        ₹{{ "{:,}".format(job.salary_max or 0) }}
-
-                    </p>
-
-                </div>
-
-                <div class="col-md-3">
-
-                    <strong>🌍 Remote</strong>
-
-                    <p class="mb-0">
-
-                        {% if job.remote %}
-
-                            Yes
-
-                        {% else %}
-
-                            No
-
-                        {% endif %}
-
-                    </p>
-
-                </div>
-
-            </div>
-
-            <hr class="my-4">
-
-            <!-- Description -->
-
-            <h3 class="mb-3">
-
-                Job Description
-
-            </h3>
-
-            <div class="job-description">
-
-                {{ job.description | safe }}
-
-            </div>
-
-            <hr class="my-4">
-
-            <!-- Skills -->
-
-            <h3 class="mb-3">
-
-                Skills Required
-
-            </h3>
-
-            <p>
-
-                {{ job.skills or "Not specified" }}
-
-            </p>
-
         </div>
 
     </div>
-
-</section>
+</div>
 
 {% endblock %}

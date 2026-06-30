@@ -4,7 +4,8 @@ from flask import (
     request
 )
 
-from services.live_search_service import LiveSearchService
+from connectors.company.greenhouse_connector import GreenhouseConnector
+from connectors.manager import ConnectorManager
 from utils.pagination import Pagination
 
 search_bp = Blueprint(
@@ -17,31 +18,56 @@ search_bp = Blueprint(
 @search_bp.route("/", methods=["GET"])
 def search():
 
-    keyword = request.args.get(
-        "keyword",
-        ""
-    ).strip()
+    keyword = request.args.get("keyword", "").strip()
+    location = request.args.get("location", "").strip()
 
-    location = request.args.get(
-        "location",
-        ""
-    ).strip()
+    manager = ConnectorManager()
+    manager.register(GreenhouseConnector())
 
-    company = request.args.get(
-        "company",
-        ""
-    ).strip()
+    try:
 
-    employment_type = request.args.get(
-        "employment_type",
-        ""
-    ).strip()
+        raw_jobs = manager.search(
+            keyword=keyword,
+            location=location
+        )
 
-    remote = request.args.get("remote")
+        print(f"✅ Manager returned {len(raw_jobs)} jobs")
 
-    sort = request.args.get(
-        "sort",
-        "newest"
+    except Exception as e:
+
+        print(f"❌ Connector Manager Error: {e}")
+        raw_jobs = []
+
+    jobs_list = []
+
+    for job in raw_jobs:
+
+        jobs_list.append({
+
+            "id": job.id,
+
+            "title": job.title,
+
+            "company": {
+                "name": job.company.name
+            },
+
+            "city": job.city,
+
+            "country": job.country,
+
+            "employment_type": job.employment_type,
+
+            "remote": job.remote,
+
+            "description": job.description,
+
+            "apply_url": job.apply_url
+
+        })
+
+    print(
+        f"🚀 [DEBUG] Sending exactly {len(jobs_list)} jobs to search/index.html!"
     )
 
     page = request.args.get(
@@ -50,26 +76,15 @@ def search():
         type=int
     )
 
-    search_service = LiveSearchService()
-
-    jobs = search_service.search(
-        keyword=keyword,
-        location=location
-    )
-
-    jobs = Pagination(
-        jobs,
+    paginated_jobs = Pagination(
+        jobs_list,
         page=page,
         per_page=9
     )
 
     return render_template(
         "search/index.html",
-        jobs=jobs,
+        jobs=paginated_jobs,
         keyword=keyword,
-        location=location,
-        company=company,
-        employment_type=employment_type,
-        remote=remote,
-        sort=sort
+        location=location
     )
