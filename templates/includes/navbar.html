@@ -21,23 +21,39 @@
             <ul class="navbar-nav mx-auto">
 
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Jobs</a>
+                    <a class="nav-link" href="{{ url_for('home.home') }}">
+                        Home
+                    </a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Companies</a>
+                    <a class="nav-link" href="{{ url_for('search.search') }}">
+                        Jobs
+                    </a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Remote Jobs</a>
+                    <a class="nav-link" href="{{ url_for('search.search') }}">
+                        Companies
+                    </a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link" href="#">About</a>
+                    <a class="nav-link" href="{{ url_for('search.search') }}?keyword=&location=">
+                        Remote Jobs
+                    </a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Contact</a>
+                    <a class="nav-link" href="{{ url_for('home.home') }}#about">
+                        About
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('home.home') }}#contact">
+                        Contact
+                    </a>
                 </li>
 
             </ul>
@@ -60,28 +76,28 @@
                     <ul class="dropdown-menu dropdown-menu-end">
 
                         <li>
-                            <a class="dropdown-item" href="#">
+                            <a class="dropdown-item" href="{{ url_for('dashboard.index') }}">
                                 <i class="bi bi-speedometer2"></i>
                                 Dashboard
                             </a>
                         </li>
 
                         <li>
-                            <a class="dropdown-item" href="#">
+                            <a class="dropdown-item" href="{{ url_for('search.search') }}">
                                 <i class="bi bi-person"></i>
                                 Profile
                             </a>
                         </li>
 
                         <li>
-                            <a class="dropdown-item" href="#">
+                            <a class="dropdown-item" href="{{ url_for('applied_jobs.index') }}">
                                 <i class="bi bi-heart"></i>
                                 Saved Jobs
                             </a>
                         </li>
 
                         <li>
-                            <a class="dropdown-item" href="#">
+                            <a class="dropdown-item" href="{{ url_for('search.search') }}">
                                 <i class="bi bi-file-earmark-person"></i>
                                 Resume
                             </a>

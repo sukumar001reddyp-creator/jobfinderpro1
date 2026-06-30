@@ -5,7 +5,18 @@ from models.job import Job
 from services.applied_job_service import AppliedJobService
 from services.recent_job_service import RecentJobService
 from connectors.manager import ConnectorManager
+from connectors.company.greenhouse_connector import GreenhouseConnector
 from types import SimpleNamespace
+
+
+def safe_get(obj, key, default=None):
+    """Safe get for both dict and object"""
+    if isinstance(obj, dict):
+        return obj.get(key, default)
+    else:
+        # For JobResult or other objects
+        return getattr(obj, key, default)
+
 
 jobs_bp = Blueprint("jobs", __name__, url_prefix="/jobs")
 
@@ -16,24 +27,30 @@ def detail(job_id):
 
     if not job:
         manager = ConnectorManager()
-        all_jobs = manager.search_all()
-        
-        matched_job = next((j for j in all_jobs if str(j.get("id")) == str(job_id)), None)
+        manager.register(GreenhouseConnector())
+
+        all_jobs = manager.search()
+
+        matched_job = next(
+            (j for j in all_jobs if str(safe_get(j, "id", "")) == str(job_id)),
+            None
+        )
         
         if matched_job:
-            comp_obj = SimpleNamespace(name=matched_job.get("company", {}).get("name", "Company"))
+            comp_name = safe_get(safe_get(matched_job, "company", {}), "name", "Company")
+            comp_obj = SimpleNamespace(name=comp_name)
             
             job = SimpleNamespace(
-                id=matched_job.get("id"),
-                title=matched_job.get("title"),
+                id=safe_get(matched_job, "id"),
+                title=safe_get(matched_job, "title"),
                 company=comp_obj,
-                city=matched_job.get("city"),
-                country=matched_job.get("country"),
-                employment_type=matched_job.get("employment_type"),
-                remote=matched_job.get("remote"),
-                description=matched_job.get("description"),
-                apply_url=matched_job.get("apply_url"),   # Important: External link
-                logo_url=matched_job.get("logo_url"),
+                city=safe_get(matched_job, "city"),
+                country=safe_get(matched_job, "country"),
+                employment_type=safe_get(matched_job, "employment_type"),
+                remote=safe_get(matched_job, "remote"),
+                description=safe_get(matched_job, "description"),
+                apply_url=safe_get(matched_job, "apply_url"),
+                logo_url=safe_get(matched_job, "logo_url"),
                 salary_min=1200000,
                 salary_max=2400000
             )
@@ -47,6 +64,7 @@ def detail(job_id):
         except:
             pass
 
+    # Check if applied
     is_applied = False
     if current_user.is_authenticated and hasattr(job, 'id'):
         try:
@@ -67,27 +85,33 @@ def apply_job(job_id):
         flash("Please login to apply for this position!", "danger")
         return redirect(url_for("auth.login"))
 
-    # 🚀 నీ rapid_connector నుండి వచ్చే రియల్ లైవ్ జాబ్స్ ని లోడ్ చేస్తున్నాం బ్రో
+    # Load real jobs from connector
     manager = ConnectorManager()
-    all_jobs = manager.search_all()
-    matched_job = next((j for j in all_jobs if j["id"] == job_id), None)
+    manager.register(GreenhouseConnector())
+    
+    # ✅ Changed search_all() → search() because search_all doesn't exist
+    all_jobs = manager.search()
+
+    matched_job = next(
+        (j for j in all_jobs if str(safe_get(j, "id", "")) == str(job_id)), 
+        None
+    )
 
     try:
-        # మన లోకల్ డేటాబేస్ లో అప్లై రికార్డ్ సేవ్ అవుతుంది
+        # Save apply record in local DB
         AppliedJobService.apply(current_user.id, job_id)
     except Exception:
         pass
 
-    # 🌟 [100% PURE ORIGINAL LINK ROUTING]:
-    # నీ rapid_connector.py ఏ ఒరిజినల్ అప్లై లింక్ ఇస్తే.. ఏ మార్పు లేకుండా డైరెక్ట్ గా ఆ లింక్ కే పంపేస్తున్నాం బ్రో!
-    if matched_job and "apply_url" in matched_job:
-        target_url = matched_job["apply_url"]
+    # Redirect to original apply URL from connector
+    if matched_job and safe_get(matched_job, "apply_url"):
+        target_url = safe_get(matched_job, "apply_url")
         
-        # యుఆర్ఎల్ కి ముందు http లేదా https ఉండేలా చూసుకుంటున్నాం బ్రో
+        # Ensure URL has protocol
         if not target_url.startswith(("http://", "https://")):
             target_url = f"https://{target_url}"
             
-        return redirect(target_url) # 👈 ఇది నేరుగా ఆ ఒరిజినల్ జాబ్ పేజీకే తీసుకెళ్తుంది!
+        return redirect(target_url)
 
-    # ఒకవేళ ఏ లింక్ దొరకకపోతే నార్మల్ గా డీటెయిల్స్ పేజీ కి వస్తుంది
+    # Fallback
     return redirect(url_for("jobs.detail", job_id=job_id))

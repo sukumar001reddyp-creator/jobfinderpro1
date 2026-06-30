@@ -8,144 +8,110 @@
 
 {% block content %}
 
-<!-- HERO SECTION -->
-<section class="hero-section">
-    <div class="container">
-        <div class="row align-items-center g-5">
+<!-- HERO SECTION - Full Left with Margin -->
+<section class="hero-section position-relative min-vh-100 d-flex align-items-center">
+    
+    <!-- Background Image -->
+    <div class="position-absolute top-0 start-0 w-100 h-100" 
+         style="background-image: url('{{ url_for('static', filename='images/hero.png') }}'); 
+                background-size: cover; 
+                background-position: center; 
+                background-attachment: fixed;">
+    </div>
+    
+    <!-- Overlay -->
+    <div class="position-absolute top-0 start-0 w-100 h-100 bg-dark" style="opacity: 0.55;"></div>
 
-            <!-- Left -->
-            <div class="col-lg-6">
+    <div class="container position-relative z-3">
+        <div class="row">
+            <div class="col-lg-7" style="margin-left: 1.2rem;">
+
                 <span class="hero-badge">🌍 120+ Sources • Real-Time Jobs</span>
 
-                <h1 class="hero-title mt-4">
+                <h1 class="hero-title display-3 fw-bold mt-4">
                     Land Your <span class="gradient-text">Dream Job</span><br>
-                    Today.
+                    Today
                 </h1>
 
-                <p class="hero-subtitle">
+                <p class="hero-subtitle lead fs-4 mt-3 mb-5">
                     One search. Thousands of opportunities from company websites, 
-                    government jobs, recruiters & top job boards.
+                    government jobs, recruiters & top job boards. Updated every minute.
                 </p>
 
-                <!-- Search -->
-                <div class="search-card">
+                <!-- Search Form -->
+                <div class="search-card shadow-lg p-4 rounded-4" style="max-width: 700px;">
                     <form action="{{ url_for('search.search') }}" method="GET">
                         <div class="row g-3 align-items-center">
-                            <div class="col-lg-5">
+                            <div class="col-md-5">
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="bi bi-search"></i></span>
-                                    <input type="text" name="keyword" class="form-control" 
+                                    <input type="text" name="keyword" class="form-control form-control-lg" 
                                            placeholder="Job title, skill or keyword">
                                 </div>
                             </div>
-                            <div class="col-lg-4">
+                            <div class="col-md-4">
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
-                                    <input type="text" name="location" class="form-control" 
+                                    <input type="text" name="location" class="form-control form-control-lg" 
                                            placeholder="City or Remote">
                                 </div>
                             </div>
-                            <div class="col-lg-3 d-grid">
-                                <button type="submit" class="btn btn-primary btn-lg">Search</button>
+                            <div class="col-md-3 d-grid">
+                                <button type="submit" class="btn btn-primary btn-lg">Search Jobs</button>
                             </div>
                         </div>
                     </form>
                 </div>
 
-                <div class="popular-searches mt-4">
-                    <span>Trending:</span>
-                    <a href="#">Python Developer</a>
-                    <a href="#">Remote Jobs</a>
-                    <a href="#">Government</a>
-                    <a href="#">Data Analyst</a>
+                <!-- Trending -->
+                <div class="popular-searches mt-5">
+                    <span class="text-white-50 fw-bold">Trending Searches:</span><br><br>
+                    <a href="{{ url_for('search.search') }}?keyword=Python" class="btn btn-outline-light btn-sm me-2 mb-2">Python Developer</a>
+                    <a href="{{ url_for('search.search') }}?keyword=Remote" class="btn btn-outline-light btn-sm me-2 mb-2">Remote Jobs</a>
+                    <a href="{{ url_for('search.search') }}?keyword=Government" class="btn btn-outline-light btn-sm me-2 mb-2">Government Jobs</a>
+                    <a href="{{ url_for('search.search') }}?keyword=Data Analyst" class="btn btn-outline-light btn-sm me-2 mb-2">Data Analyst</a>
                 </div>
-            </div>
 
-            <!-- Right Visual -->
-            <div class="col-lg-6">
-                <img src="{{ url_for('static', filename='images/hero.png') }}" 
-                     alt="Dream Job" class="hero-image img-fluid">
             </div>
         </div>
     </div>
 </section>
 
 <!-- STATS BAR -->
-
-<section class="stats-section">
-
+<section class="stats-section py-4 bg-light">
     <div class="container">
-
         <div class="row text-center g-4">
 
             <div class="col-6 col-lg-3">
-
                 <div class="stat-card">
-
-                    <h2 class="stat-number">
-
-                        {{ job_count }}
-
-                    </h2>
-
+                    <h2 class="stat-number">{{ job_count }}</h2>
                     <p>Live Jobs</p>
-
                 </div>
-
             </div>
 
             <div class="col-6 col-lg-3">
-
                 <div class="stat-card">
-
-                    <h2 class="stat-number">
-
-                        {{ company_count }}
-
-                    </h2>
-
+                    <h2 class="stat-number">{{ company_count }}</h2>
                     <p>Companies</p>
-
                 </div>
-
             </div>
 
             <div class="col-6 col-lg-3">
-
                 <div class="stat-card">
-
-                    <h2 class="stat-number">
-
-                        {{ source_count }}
-
-                    </h2>
-
+                    <h2 class="stat-number">{{ source_count }}</h2>
                     <p>Sources</p>
-
                 </div>
-
             </div>
 
             <div class="col-6 col-lg-3">
-
                 <div class="stat-card">
-
-                    <h2 class="stat-number">
-
-                        50+
-
-                    </h2>
-
+                    <h2 class="stat-number">50+</h2>
                     <p>Countries</p>
-
                 </div>
-
             </div>
 
         </div>
-
     </div>
-
 </section>
 
 <!-- FEATURED JOBS -->
@@ -153,18 +119,15 @@
     <div class="container">
 
         <div class="d-flex justify-content-between align-items-end mb-5">
-    <div>
-        <span class="section-badge">NEW JOBS</span>
-        <h2 class="section-title">Latest Opportunities</h2>
-    </div>
+            <div>
+                <span class="section-badge">NEW JOBS</span>
+                <h2 class="section-title">Latest Opportunities</h2>
+            </div>
 
-    <a href="{{ url_for('search.search') }}"
-   class="btn btn-outline-primary">
-
-    View All Jobs →
-
-</a>
-</div>
+            <a href="{{ url_for('search.search') }}" class="btn btn-outline-primary">
+                View All Jobs →
+            </a>
+        </div>
 
         <div class="row g-4">
 
@@ -175,113 +138,58 @@
                 <div class="job-card h-100">
 
                     <div class="d-flex justify-content-between align-items-start">
-
                         <div>
-
                             <h6 class="company-name">
-
-                                {{ job.company.name }}
-
-                                <i class="bi bi-patch-check-fill text-primary"></i>
-
+                                {{ job.company.name if job.company else 'Unknown Company' }}
                             </h6>
-
                             <small class="text-muted">
-
-                                <i class="bi bi-geo-alt"></i>
-
-                                {{ job.city }}, {{ job.country }}
-
+                                <i class="bi bi-geo-alt"></i> {{ job.city or '' }}, {{ job.country or '' }}
                             </small>
-
                         </div>
-
                         <button class="save-btn">
-
                             <i class="bi bi-heart"></i>
-
                         </button>
-
                     </div>
 
-                    <h4 class="job-title mt-4">
-
-                        {{ job.title }}
-
-                    </h4>
+                    <h4 class="job-title mt-4">{{ job.title }}</h4>
 
                     <div class="mt-3">
-
-                        <span class="badge bg-primary">
-
-                            {{ job.employment_type }}
-
-                        </span>
-
-                        {% if job.remote %}
-
-                        <span class="badge bg-success">
-
-                            Remote
-
-                        </span>
-
+                        {% if job.employment_type %}
+                            <span class="badge bg-primary">{{ job.employment_type }}</span>
                         {% endif %}
-
+                        {% if job.remote %}
+                            <span class="badge bg-success">Remote</span>
+                        {% endif %}
                     </div>
 
                     <h5 class="salary mt-3">
-
-                        ₹{{ "{:,}".format(job.salary_min or 0) }}
-
-                        -
-
-                        ₹{{ "{:,}".format(job.salary_max or 0) }}
-
+                        {% if job.salary_min or job.salary_max %}
+                            ₹{{ "{:,}".format(job.salary_min or 0) }} - ₹{{ "{:,}".format(job.salary_max or 0) }}
+                        {% else %}
+                            <span class="text-muted">Salary Not Disclosed</span>
+                        {% endif %}
                     </h5>
 
                     <div class="d-flex gap-2 mt-4">
-
-                        <a href="{{ job.apply_url }}"
-                           target="_blank"
-                           class="btn btn-primary flex-fill">
-
-                            Apply Now
-
-                        </a>
-
-                        <a href="#"
-                           class="btn btn-outline-secondary">
-
-                            Details
-
-                        </a>
-
+                        <a href="{{ job.apply_url or '#' }}" target="_blank" class="btn btn-primary flex-fill">Apply Now</a>
+                        <a href="{{ url_for('jobs.detail', job_id=job.id) if job.id else '#' }}" class="btn btn-outline-secondary">Details</a>
                     </div>
 
                 </div>
-
             </div>
 
             {% else %}
-
             <div class="col-12">
-
                 <div class="alert alert-info text-center">
-
-                    No jobs available.
-
+                    No jobs available at the moment.
                 </div>
-
             </div>
-
             {% endfor %}
 
         </div>
-
     </div>
-
 </section>
+
 <!-- CATEGORIES -->
 <section class="categories-section py-5 bg-light">
     <div class="container">
