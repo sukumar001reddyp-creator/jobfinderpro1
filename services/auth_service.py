@@ -3,36 +3,43 @@ from extensions import db
 
 
 def register_user(form):
+    try:
+        existing_email = User.query.filter_by(email=form.email.data).first()
+        if existing_email:
+            return False, "Email already registered!"
 
-    # Check email already exists
-    existing_user = User.query.filter_by(
-        email=form.email.data
-    ).first()
+        existing_phone = User.query.filter_by(phone=form.phone.data).first()
+        if existing_phone:
+            return False, "Phone number already registered!"
 
-    if existing_user:
-        return False, "Email already exists."
+        user = User(
+            first_name=form.first_name.data,
+            last_name=form.last_name.data,
+            email=form.email.data,
+            phone=form.phone.data
+        )
 
-    user = User(
-        first_name=form.first_name.data,
-        last_name=form.last_name.data,
-        email=form.email.data,
-        phone=form.phone.data
-    )
+        # Hash password
+        user.set_password(form.password.data)
 
-    user.set_password(form.password.data)
+        db.session.add(user)
+        db.session.commit()
 
-    db.session.add(user)
-    db.session.commit()
+        return True, "Registration successful! Please login."
 
-    return True, "Account created successfully."
-    from models.user import User
+    except Exception as e:
+        db.session.rollback()
+        return False, f"Registration failed: {e}"
 
 
 def authenticate_user(email, password):
+    try:
+        user = User.query.filter_by(email=email).first()
 
-    user = User.query.filter_by(email=email).first()
+        if user and user.check_password(password):
+            return user
 
-    if user and user.check_password(password):
-        return user
+        return None
 
-    return None
+    except Exception:
+        return None

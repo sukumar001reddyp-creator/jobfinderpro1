@@ -1,103 +1,48 @@
-from flask import Blueprint, render_template
-from flask import (
-    Blueprint,
-    render_template,
-    redirect,
-    url_for,
-    flash
-)
-from flask_login import (
-    login_user,
-    logout_user,
-    login_required,
-    current_user
-)
-from flask_login import login_user
-from services.auth_service import authenticate_user
-from forms.auth_forms import RegisterForm
-from services.auth_service import register_user
+from flask import Blueprint, render_template, redirect, url_for, flash
+from flask_login import login_user, logout_user, login_required
 
-auth_bp = Blueprint(
-    "auth",
-    __name__,
-    url_prefix="/auth"
-)
-
-
-from forms.auth_forms import RegisterForm
+from services.auth_service import authenticate_user, register_user
 from forms.auth_forms import RegisterForm, LoginForm
+
+auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
+
 
 @auth_bp.route("/register", methods=["GET", "POST"])
 def register():
-
     form = RegisterForm()
 
     if form.validate_on_submit():
-
         success, message = register_user(form)
 
         if success:
-
             flash(message, "success")
-
-            return redirect(
-                url_for("auth.login")
-            )
+            return redirect(url_for("auth.login"))
 
         flash(message, "danger")
 
-    return render_template(
-        "auth/register.html",
-        form=form
-    )
+    return render_template("auth/register.html", form=form)
 
 
 @auth_bp.route("/login", methods=["GET", "POST"])
 def login():
-
     form = LoginForm()
 
     if form.validate_on_submit():
-
-        user = authenticate_user(
-            form.email.data,
-            form.password.data
-        )
+        user = authenticate_user(form.email.data, form.password.data)
 
         if user:
-
             login_user(user)
+            flash("Login successful!", "success")
+            return redirect(url_for("home.home"))
 
-            flash(
-                "Login successful!",
-                "success"
-            )
+        flash("Invalid email or password.", "danger")
 
-            return redirect(
-                url_for("home.home")
-            )
+    return render_template("auth/login.html", form=form)
 
-        flash(
-            "Invalid email or password.",
-            "danger"
-        )
-
-    return render_template(
-        "auth/login.html",
-        form=form
-    )
 
 @auth_bp.route("/logout")
 @login_required
 def logout():
-
     logout_user()
-
-    flash(
-        "Logged out successfully.",
-        "success"
-    )
-
-    return redirect(
-        url_for("home.home")
-    )    
+    flash("Logged out successfully.", "success")
+    return redirect(url_for("home.home"))
