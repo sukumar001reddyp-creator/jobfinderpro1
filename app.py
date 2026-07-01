@@ -1,6 +1,7 @@
 from flask import Flask
 from config import Config
-from connectors.manager import ConnectorManager
+import os
+
 # Routes
 from routes.home import home_bp
 from routes.search import search_bp
@@ -17,10 +18,17 @@ from routes.pdf import pdf_bp
 # Extensions
 from extensions import db, migrate, login_manager, mail
 
+print("=" * 50)
+print("DATABASE_URL =", os.getenv("DATABASE_URL"))
+print("=" * 50)
 
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
+
+    print("=" * 50)
+    print("SQLALCHEMY_DATABASE_URI =", app.config.get("SQLALCHEMY_DATABASE_URI"))
+    print("=" * 50)
 
     # Initialize extensions
     db.init_app(app)
@@ -31,7 +39,7 @@ def create_app():
     # Import user_loader
     import utils.login_manager
 
-    # Import models
+    # Import models (to register them)
     import models
 
     # Register blueprints
@@ -54,6 +62,6 @@ app = create_app()
 
 if __name__ == "__main__":
     with app.app_context():
-        db.create_all()   # ← Add this line
-        print("Tables created!")
+        db.create_all()   # Create tables on startup
+        print("✅ Tables created successfully!")
     app.run(debug=True)
