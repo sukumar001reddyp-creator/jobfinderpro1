@@ -1,52 +1,33 @@
-    def search(self, query="Software Engineer", location="Hyderabad", limit=30):
-        print(f"🔍 Google Jobs searching: {query} in {location}")
+from extensions import db
+from models.job_source import JobSource
+from app import create_app
 
-        payload = {
-            "q": query,
-            "gl": "in",
-            "hl": "en",
-            "location": location,
-            "num": limit
-        }
+def seed_job_sources():
+    sources = [
+        {"name": "Greenhouse", "source_type": "api", "is_active": True},
+        {"name": "LinkedIn", "source_type": "scraper", "is_active": True},
+        {"name": "Indeed", "source_type": "scraper", "is_active": True},
+        {"name": "Naukri", "source_type": "scraper", "is_active": True},
+        {"name": "Google Jobs", "source_type": "api", "is_active": True},
+    ]
 
-        headers = {
-            'X-API-KEY': self.api_key,
-            'Content-Type': 'application/json'
-        }
+    for source in sources:
+        existing = JobSource.query.filter_by(name=source["name"]).first()
+        if not existing:
+            new_source = JobSource(
+                name=source["name"],
+                source_type=source["source_type"],
+                is_active=source["is_active"]
+            )
+            db.session.add(new_source)
+            print(f"✅ Added {source['name']}")
+        else:
+            print(f"⚡ {source['name']} already exists")
 
-        try:
-            response = requests.post(self.url, json=payload, headers=headers)
-            data = response.json()
+    db.session.commit()
+    print("🎉 All job sources seeded successfully!")
 
-            jobs = []
-            job_list = data.get('jobs', [])[:limit]
-
-            for job in job_list:
-                company = CompanyResult(
-                    name=job.get('company', 'Unknown Company'),
-                    logo_url=None
-                )
-
-                jobs.append(JobResult(
-                    job_id=job.get('id'),
-                    title=job.get('title'),
-                    company=company,
-                    city=job.get('location'),
-                    country="India",
-                    employment_type=job.get('employmentType', ''),
-                    remote=job.get('isRemote', False),
-                    salary_min=None,
-                    salary_max=None,
-                    apply_url=job.get('applyLink'),
-                    description=job.get('description', ''),
-                    source="Google Jobs",
-                    experience_level="",
-                    industry=""
-                ))
-
-            print(f"✅ Google Jobs: {len(jobs)} real jobs fetched")
-            return jobs
-
-        except Exception as e:
-            print(f"❌ Google Jobs Error: {e}")
-            return []
+if __name__ == "__main__":
+    app = create_app()
+    with app.app_context():
+        seed_job_sources()

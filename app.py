@@ -18,17 +18,9 @@ from routes.pdf import pdf_bp
 # Extensions
 from extensions import db, migrate, login_manager, mail
 
-print("=" * 50)
-print("DATABASE_URL =", os.getenv("DATABASE_URL"))
-print("=" * 50)
-
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
-
-    print("=" * 50)
-    print("SQLALCHEMY_DATABASE_URI =", app.config.get("SQLALCHEMY_DATABASE_URI"))
-    print("=" * 50)
 
     # Initialize extensions
     db.init_app(app)
@@ -36,10 +28,20 @@ def create_app():
     login_manager.init_app(app)
     mail.init_app(app)
 
-    # Import user_loader
-    import utils.login_manager
+    # ==================== FLASK-LOGIN USER LOADER ====================
+    @login_manager.user_loader
+    def load_user(user_id):
+        from models.user import User
+        return User.query.get(int(user_id))
 
-    # Import models (to register them)
+    @login_manager.unauthorized_handler
+    def unauthorized():
+        from flask import flash, redirect, url_for
+        flash("Please log in to access this page.", "warning")
+        return redirect(url_for("auth.login"))
+    # ============================================================
+
+    # Import models
     import models
 
     # Register blueprints
@@ -60,8 +62,11 @@ def create_app():
 
 app = create_app()
 
+# ==================== TABLE CREATION ====================
+with app.app_context():
+    db.create_all()
+    print("✅ Tables created on Render server successfully!")
+# =======================================================
+
 if __name__ == "__main__":
-    with app.app_context():
-        db.create_all()   # Create tables on startup
-        print("✅ Tables created successfully!")
     app.run(debug=True)
