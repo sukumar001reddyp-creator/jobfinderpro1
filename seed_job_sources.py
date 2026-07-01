@@ -1,59 +1,52 @@
-from app import create_app
-from extensions import db
-from models.job_source import JobSource
+    def search(self, query="Software Engineer", location="Hyderabad", limit=30):
+        print(f"🔍 Google Jobs searching: {query} in {location}")
 
-app = create_app()
-
-with app.app_context():
-
-    sources = [
-        {
-            "name": "Greenhouse",
-            "source_type": "API",
-            "website": "https://www.greenhouse.io"
-        },
-        {
-            "name": "Lever",
-            "source_type": "API",
-            "website": "https://www.lever.co"
-        },
-        {
-            "name": "Workday",
-            "source_type": "API",
-            "website": "https://www.workday.com"
-        },
-        {
-            "name": "RSS",
-            "source_type": "RSS",
-            "website": ""
+        payload = {
+            "q": query,
+            "gl": "in",
+            "hl": "en",
+            "location": location,
+            "num": limit
         }
-    ]
 
-    for source in sources:
+        headers = {
+            'X-API-KEY': self.api_key,
+            'Content-Type': 'application/json'
+        }
 
-        exists = JobSource.query.filter_by(
-            name=source["name"]
-        ).first()
+        try:
+            response = requests.post(self.url, json=payload, headers=headers)
+            data = response.json()
 
-        if not exists:
+            jobs = []
+            job_list = data.get('jobs', [])[:limit]
 
-            db.session.add(
-                JobSource(
-                    name=source["name"],
-                    source_type=source["source_type"],
-                    website=source["website"],
-                    api_available=source["source_type"] == "API",
-                    rss_available=source["source_type"] == "RSS",
-                    is_active=True
+            for job in job_list:
+                company = CompanyResult(
+                    name=job.get('company', 'Unknown Company'),
+                    logo_url=None
                 )
-            )
 
-            print(f"✔ Added: {source['name']}")
+                jobs.append(JobResult(
+                    job_id=job.get('id'),
+                    title=job.get('title'),
+                    company=company,
+                    city=job.get('location'),
+                    country="India",
+                    employment_type=job.get('employmentType', ''),
+                    remote=job.get('isRemote', False),
+                    salary_min=None,
+                    salary_max=None,
+                    apply_url=job.get('applyLink'),
+                    description=job.get('description', ''),
+                    source="Google Jobs",
+                    experience_level="",
+                    industry=""
+                ))
 
-        else:
+            print(f"✅ Google Jobs: {len(jobs)} real jobs fetched")
+            return jobs
 
-            print(f"⏩ Already Exists: {source['name']}")
-
-    db.session.commit()
-
-    print("\n✅ Job Sources Ready!")
+        except Exception as e:
+            print(f"❌ Google Jobs Error: {e}")
+            return []

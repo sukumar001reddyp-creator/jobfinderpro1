@@ -1,0 +1,17 @@
+ASHBY_COMPANIES = [
+    ("replit", "Replit"),
+    ("linear", "Linear"),
+    ("perplexity", "Perplexity"),
+    ("raycast", "Raycast"),
+    ("v0", "V0"),
+    ("supabase", "Supabase"),
+    ("vercel", "Vercel"),
+    ("arc", "Arc"),
+    ("cursor", "Cursor"),
+    ("clerk", "Clerk"),
+    ("trigger", "Trigger.dev"),
+    ("cal", "Cal.com"),
+    ("dub", "Dub"),
+    ("tldraw", "tldraw"),
+    ("lovable", "Lovable"),
+]

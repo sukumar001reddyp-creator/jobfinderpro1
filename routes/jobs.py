@@ -28,7 +28,6 @@ def detail(job_id):
     if not job:
         manager = ConnectorManager()
         manager.register(GreenhouseConnector())
-
         all_jobs = manager.search()
 
         matched_job = next(
@@ -81,37 +80,29 @@ def detail(job_id):
 
 @jobs_bp.route("/<int:job_id>/apply", methods=["POST"])
 def apply_job(job_id):
+
     if not current_user.is_authenticated:
         flash("Please login to apply for this position!", "danger")
         return redirect(url_for("auth.login"))
 
-    # Load real jobs from connector
-    manager = ConnectorManager()
-    manager.register(GreenhouseConnector())
-    
-    # ✅ Changed search_all() → search() because search_all doesn't exist
-    all_jobs = manager.search()
+    # Load job from database
+    job = Job.query.get_or_404(job_id)
 
-    matched_job = next(
-        (j for j in all_jobs if str(safe_get(j, "id", "")) == str(job_id)), 
-        None
-    )
-
+    # Save applied history
     try:
-        # Save apply record in local DB
-        AppliedJobService.apply(current_user.id, job_id)
-    except Exception:
-        pass
+        AppliedJobService.apply(current_user.id, job.id)
+    except Exception as e:
+        print(f"Apply history error: {e}")
 
-    # Redirect to original apply URL from connector
-    if matched_job and safe_get(matched_job, "apply_url"):
-        target_url = safe_get(matched_job, "apply_url")
-        
-        # Ensure URL has protocol
+    # Redirect to original company job page
+    if job.apply_url:
+
+        target_url = job.apply_url.strip()
+
         if not target_url.startswith(("http://", "https://")):
-            target_url = f"https://{target_url}"
-            
+            target_url = "https://" + target_url
+
         return redirect(target_url)
 
-    # Fallback
-    return redirect(url_for("jobs.detail", job_id=job_id))
+    flash("Apply link not available for this job.", "warning")
+    return redirect(url_for("jobs.detail", job_id=job.id))
