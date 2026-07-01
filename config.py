@@ -4,6 +4,8 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
+# config.py ఉన్న రూట్ ఫోల్డర్ పాత్ తీసుకుంటుంది
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
 class Config:
     """Base Configuration"""
@@ -13,10 +15,10 @@ class Config:
     
     WTF_CSRF_ENABLED = True
 
-    # Database
+    # Database - ఇక్కడ instance/jobfinder.db కి కరెక్ట్ అబ్సొల్యూట్ పాత్ సెట్ చేశాం
     SQLALCHEMY_DATABASE_URI = os.getenv(
         "DATABASE_URL",
-        "sqlite:///jobfinder.db"
+        f"sqlite:///{os.path.join(BASE_DIR, 'instance', 'jobfinder.db')}"
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
