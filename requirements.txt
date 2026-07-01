@@ -28,3 +28,4 @@ Flask-WTF
 Werkzeug
 gunicorn
 reportlab
+email-validator
